@@ -77,15 +77,18 @@ export default function Preview({ code, containerRef }: PreviewProps) {
             var Fragment = React.Fragment;
           <\/script>
           <script type="text/babel" data-presets="react">
-            ${processedCode}
+            (function() {
+              try {
+                ${processedCode}
 
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            try {
-              root.render(<App />);
-              window.parent.postMessage({ type: 'preview-success' }, '*');
-            } catch (err) {
-              window.parent.postMessage({ type: 'preview-error', error: err.message }, '*');
-            }
+                const rootElement = document.getElementById('root');
+                const root = ReactDOM.createRoot(rootElement);
+                root.render(<App />);
+                window.parent.postMessage({ type: 'preview-success' }, '*');
+              } catch (err) {
+                window.parent.postMessage({ type: 'preview-error', error: err.message }, '*');
+              }
+            })();
           <\/script>
         </body>
       </html>

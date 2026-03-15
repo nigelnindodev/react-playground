@@ -1,67 +1,77 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
+import type { MutableRefObject } from 'react';
 import type { ValidateFunction, ValidationResult } from '../types';
 
 interface ValidatorProps {
-  code: string;
   validateFn: ValidateFunction | null;
-  onValidationComplete: (result: ValidationResult) => void;
+  containerRef: MutableRefObject<HTMLDivElement | null>;
 }
 
-export default function Validator({ code, validateFn, onValidationComplete }: ValidatorProps) {
-  const [isValidating, setIsValidating] = useState(false);
+export default function Validator({ validateFn, containerRef }: ValidatorProps) {
   const [result, setResult] = useState<ValidationResult | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [isValidating, setIsValidating] = useState(false);
 
-  useEffect(() => {
-    if (!validateFn || !iframeRef.current) return;
-
-    const iframe = iframeRef.current;
-    const container = iframe.contentDocument?.getElementById('root');
-
-    if (!container) return;
+  const handleValidate = () => {
+    if (!validateFn || !containerRef.current) {
+      setResult({ passed: false, message: 'Preview not ready or no validation configured' });
+      return;
+    }
 
     setIsValidating(true);
-    
+    setResult(null);
+
     try {
-      const validationResult = validateFn(container as HTMLElement);
+      const validationResult = validateFn(containerRef.current);
       setResult(validationResult);
-      onValidationComplete(validationResult);
     } catch (err) {
-      const errorResult = { 
+      setResult({ 
         passed: false, 
         message: err instanceof Error ? err.message : 'Validation failed' 
-      };
-      setResult(errorResult);
-      onValidationComplete(errorResult);
+      });
     } finally {
       setIsValidating(false);
     }
-  }, [code, validateFn]);
+  };
 
   if (!validateFn) {
-    return (
-      <div style={{ padding: '16px', color: '#666', fontSize: '14px' }}>
-        No validation configured for this challenge.
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div style={{ 
-      padding: '16px', 
-      background: result?.passed ? '#e6ffed' : result ? '#ffebe9' : '#f6f8fa',
-      borderRadius: '6px',
-      margin: '16px'
-    }}>
-      <div style={{ fontWeight: 600, marginBottom: '8px' }}>
-        {isValidating ? 'Validating...' : result ? (result.passed ? '✓ Passed' : '✗ Failed') : 'Ready to validate'}
-      </div>
-      {result && <div style={{ fontSize: '14px' }}>{result.message}</div>}
-      <iframe
-        ref={iframeRef}
-        style={{ display: 'none' }}
-        title="Validator"
-      />
+    <div style={{ padding: '16px' }}>
+      <button
+        onClick={handleValidate}
+        disabled={isValidating}
+        style={{
+          padding: '8px 16px',
+          fontSize: '14px',
+          fontWeight: 600,
+          background: isValidating ? '#94a3b8' : '#2ea44f',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '6px',
+          cursor: isValidating ? 'not-allowed' : 'pointer',
+        }}
+      >
+        {isValidating ? 'Validating...' : 'Validate'}
+      </button>
+
+      {result && (
+        <div style={{ 
+          padding: '12px', 
+          marginTop: '12px',
+          background: result.passed ? '#e6ffed' : '#ffebe9',
+          borderRadius: '6px',
+          border: `1px solid ${result.passed ? '#3fb950' : '#f97583'}`
+        }}>
+          <div style={{ fontWeight: 600, color: result.passed ? '#1a7f37' : '#d73a49' }}>
+            {result.passed ? '✓ Passed' : '✗ Failed'}
+          </div>
+          <div style={{ fontSize: '14px', marginTop: '4px', color: result.passed ? '#1a7f37' : '#d73a49' }}>
+            {result.message}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

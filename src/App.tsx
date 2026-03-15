@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import CodeEditor from './components/Editor';
 import Preview from './components/Preview';
 import Validator from './components/Validator';
 import ChallengeLoader from './components/ChallengeLoader';
-import type { Challenge, ValidateFunction, ValidationResult } from './types';
+import type { Challenge, ValidateFunction } from './types';
 
 const challenges = ['01-counter'];
 
@@ -12,17 +12,12 @@ export default function App() {
   const [code, setCode] = useState('');
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [validateFn, setValidateFn] = useState<ValidateFunction | null>(null);
-  const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleChallengeLoad = useCallback((ch: Challenge, fn: ValidateFunction) => {
     setChallenge(ch);
     setCode(ch.starterCode);
     setValidateFn(() => fn);
-    setValidationResult(null);
-  }, []);
-
-  const handleValidationComplete = useCallback((result: ValidationResult) => {
-    setValidationResult(result);
   }, []);
 
   return (
@@ -87,7 +82,7 @@ export default function App() {
               <CodeEditor value={code} onChange={setCode} />
             </div>
             <div style={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
-              <Preview code={code} />
+              <Preview code={code} containerRef={containerRef} />
             </div>
           </div>
 
@@ -96,9 +91,8 @@ export default function App() {
             background: '#fff'
           }}>
             <Validator 
-              code={code} 
               validateFn={validateFn} 
-              onValidationComplete={handleValidationComplete}
+              containerRef={containerRef}
             />
           </div>
         </>

@@ -6,8 +6,8 @@ interface ChallengeLoaderProps {
   onLoad: (challenge: Challenge, validateFn: ValidateFunction) => void;
 }
 
-const challengeModules = import.meta.glob('../challenges/**/starter.tsx', { eager: true });
-const validateModules = import.meta.glob('../challenges/**/validate.ts');
+const challengeModules = import.meta.glob('../../challenges/**/starter.tsx', { eager: true, query: '?raw' });
+const validateModules = import.meta.glob('../../challenges/**/validate.ts');
 
 export default function ChallengeLoader({ challengeId, onLoad }: ChallengeLoaderProps) {
   const [loading, setLoading] = useState(true);
@@ -19,8 +19,8 @@ export default function ChallengeLoader({ challengeId, onLoad }: ChallengeLoader
 
     const loadChallenge = async () => {
       try {
-        const starterModule = challengeModules[`../challenges/${challengeId}/starter.tsx`] as { default: string };
-        const validatePath = `../challenges/${challengeId}/validate.ts`;
+        const starterModule = challengeModules[`../../challenges/${challengeId}/starter.tsx`] as { default: string };
+        const validatePath = `../../challenges/${challengeId}/validate.ts`;
         
         if (!starterModule) {
           throw new Error(`Challenge ${challengeId} not found`);
@@ -28,11 +28,11 @@ export default function ChallengeLoader({ challengeId, onLoad }: ChallengeLoader
 
         let validateFn: ValidateFunction | null = null;
         if (validateModules[validatePath]) {
-          const validateModule = await import(`../challenges/${challengeId}/validate.ts`);
+          const validateModule = await import(`../../challenges/${challengeId}/validate.ts`);
           validateFn = validateModule.default;
         }
 
-        const instructions = await import(`../challenges/${challengeId}/instructions.md?raw`);
+        const instructions = await import(`../../challenges/${challengeId}/instructions.md?raw`);
 
         const challenge: Challenge = {
           id: challengeId,
@@ -52,8 +52,14 @@ export default function ChallengeLoader({ challengeId, onLoad }: ChallengeLoader
     loadChallenge();
   }, [challengeId, onLoad]);
 
-  if (loading) return <div style={{ padding: '16px' }}>Loading challenge...</div>;
-  if (error) return <div style={{ padding: '16px', color: '#d73a49' }}>Error: {error}</div>;
+  if (loading) {
+    return <div style={{ padding: '16px' }}>Loading challenge...</div>;
+  }
+  
+  if (error) {
+    return <div style={{ padding: '16px', color: '#d73a49' }}>Error: {error}</div>;
+  }
+  
   return null;
 }
 

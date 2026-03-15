@@ -12,19 +12,21 @@ export default function App() {
   const [code, setCode] = useState('');
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [validateFn, setValidateFn] = useState<ValidateFunction | null>(null);
+  const [showHint, setShowHint] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleChallengeLoad = useCallback((ch: Challenge, fn: ValidateFunction) => {
     setChallenge(ch);
     setCode(ch.starterCode);
     setValidateFn(() => fn);
+    setShowHint(false); // Reset hints when loading a new challenge
   }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <header style={{ 
-        padding: '12px 24px', 
-        background: '#1e1e1e', 
+      <header style={{
+        padding: '12px 24px',
+        background: '#1e1e1e',
         color: '#fff',
         display: 'flex',
         alignItems: 'center',
@@ -53,26 +55,86 @@ export default function App() {
 
       <ChallengeLoader challengeId={selectedChallenge} onLoad={handleChallengeLoad} />
 
-      {challenge && (
-        <>
-          <div style={{ 
-            padding: '16px 24px', 
-            background: '#f6f8fa',
-            borderBottom: '1px solid #e1e4e8',
-            maxHeight: '200px',
-            overflow: 'auto'
-          }}>
-            <h2 style={{ fontSize: '16px', margin: '0 0 8px 0' }}>{challenge.name}</h2>
-            <div style={{ fontSize: '14px', whiteSpace: 'pre-wrap', color: '#24292e' }}>
-              {challenge.description}
-            </div>
-          </div>
+      {challenge && (() => {
+        // Parse the Markdown for Hints. Assumes format has `## Hints`
+        const parts = challenge.description.split(/##\s+Hints/i);
+        const mainDescription = parts[0];
+        const hintsValue = parts.length > 1 ? parts[1].trim() : null;
 
+        return (
           <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-            <div style={{ width: '50%', borderRight: '1px solid #e1e4e8' }}>
-              <div style={{ 
-                padding: '8px 16px', 
-                background: '#1e1e1e', 
+
+            {/* Left Column: Instructions & Preview */}
+            <div style={{ width: '40%', display: 'flex', flexDirection: 'column', borderRight: '1px solid #e1e4e8' }}>
+
+              {/* Top Left: Instructions */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
+                <div style={{
+                  flex: 1,
+                  padding: '16px 24px',
+                  background: '#f6f8fa',
+                  overflow: 'auto'
+                }}>
+                  <h2 style={{ fontSize: '16px', margin: '0 0 8px 0' }}>{challenge.name}</h2>
+                  <div style={{ fontSize: '14px', whiteSpace: 'pre-wrap', color: '#24292e' }}>
+                    {mainDescription}
+                  </div>
+
+                  {hintsValue && (
+                    <div style={{ marginTop: '16px', borderTop: '1px solid #e1e4e8', paddingTop: '16px' }}>
+                      <button
+                        onClick={() => setShowHint(!showHint)}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#e1e4e8',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: 600,
+                          color: '#24292e'
+                        }}
+                      >
+                        {showHint ? 'Hide Hints' : 'Show Hints'}
+                      </button>
+                      {showHint && (
+                        <div style={{
+                          marginTop: '12px',
+                          padding: '12px',
+                          background: '#fff',
+                          border: '1px solid #e1e4e8',
+                          borderRadius: '6px',
+                          fontSize: '14px',
+                          whiteSpace: 'pre-wrap',
+                          color: '#24292e'
+                        }}>
+                          {hintsValue}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Mid Left: Validator */}
+                <div style={{ borderTop: '1px solid #e1e4e8', background: '#fff' }}>
+                  <Validator
+                    validateFn={validateFn}
+                    containerRef={containerRef}
+                  />
+                </div>
+              </div>
+
+              {/* Bottom Left: Preview */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', borderTop: '1px solid #e1e4e8', minHeight: 0 }}>
+                <Preview code={code} containerRef={containerRef} />
+              </div>
+            </div>
+
+            {/* Right Column: Editor */}
+            <div style={{ width: '60%', display: 'flex', flexDirection: 'column' }}>
+              <div style={{
+                padding: '8px 16px',
+                background: '#1e1e1e',
                 color: '#fff',
                 fontSize: '12px',
                 borderBottom: '1px solid #333'
@@ -81,22 +143,10 @@ export default function App() {
               </div>
               <CodeEditor value={code} onChange={setCode} />
             </div>
-            <div style={{ width: '50%', display: 'flex', flexDirection: 'column' }}>
-              <Preview code={code} containerRef={containerRef} />
-            </div>
-          </div>
 
-          <div style={{ 
-            borderTop: '1px solid #e1e4e8',
-            background: '#fff'
-          }}>
-            <Validator 
-              validateFn={validateFn} 
-              containerRef={containerRef}
-            />
           </div>
-        </>
-      )}
+        );
+      })()}
     </div>
   );
 }

@@ -11,7 +11,7 @@ export default function Validator({ validateFn, containerRef }: ValidatorProps) 
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
-  const handleValidate = () => {
+  const handleValidate = async () => {
     if (!validateFn || !containerRef.current) {
       setResult({ passed: false, message: 'Preview not ready or no validation configured' });
       return;
@@ -21,12 +21,12 @@ export default function Validator({ validateFn, containerRef }: ValidatorProps) 
     setResult(null);
 
     try {
-      const validationResult = validateFn(containerRef.current);
+      const validationResult = await validateFn(containerRef.current);
       setResult(validationResult);
     } catch (err) {
-      setResult({ 
-        passed: false, 
-        message: err instanceof Error ? err.message : 'Validation failed' 
+      setResult({
+        passed: false,
+        message: err instanceof Error ? err.message : 'Validation failed'
       });
     } finally {
       setIsValidating(false);
@@ -57,8 +57,8 @@ export default function Validator({ validateFn, containerRef }: ValidatorProps) 
       </button>
 
       {result && (
-        <div style={{ 
-          padding: '12px', 
+        <div style={{
+          padding: '12px',
           marginTop: '12px',
           background: result.passed ? '#e6ffed' : '#ffebe9',
           borderRadius: '6px',

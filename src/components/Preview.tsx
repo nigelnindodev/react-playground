@@ -58,9 +58,9 @@ export default function Preview({ code, containerRef }: PreviewProps) {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             }
           </style>
-          <script src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
-          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
-          <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"><\/script>
+          <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+          <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+          <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
         </head>
         <body>
           <div id="root"></div>
@@ -75,7 +75,7 @@ export default function Preview({ code, containerRef }: PreviewProps) {
             var useReducer = React.useReducer;
             var createContext = React.createContext;
             var Fragment = React.Fragment;
-          <\/script>
+          </script>
           <script type="text/babel" data-presets="react">
             (function() {
               try {
@@ -89,7 +89,7 @@ export default function Preview({ code, containerRef }: PreviewProps) {
                 window.parent.postMessage({ type: 'preview-error', error: err.message }, '*');
               }
             })();
-          <\/script>
+          </script>
         </body>
       </html>
     `;

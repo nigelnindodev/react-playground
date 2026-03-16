@@ -1,4 +1,4 @@
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import type { Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
@@ -7,6 +7,7 @@ import { initVimMode } from 'monaco-vim';
 interface CodeEditorProps {
   value: string;
   onChange: (value: string) => void;
+  isVimMode?: boolean;
 }
 
 function handleEditorWillMount(monaco: Monaco) {
@@ -27,19 +28,43 @@ function handleEditorWillMount(monaco: Monaco) {
   });
 }
 
-export default function CodeEditor({ value, onChange }: CodeEditorProps) {
+export default function CodeEditor({ value, onChange, isVimMode = true }: CodeEditorProps) {
   const vimModeRef = useRef<ReturnType<typeof initVimMode> | null>(null);
   const statusBarRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+
+  useEffect(() => {
+    if (!editorRef.current || !statusBarRef.current) return;
+
+    if (isVimMode) {
+      if (!vimModeRef.current) {
+        vimModeRef.current = initVimMode(editorRef.current, statusBarRef.current);
+      }
+    } else {
+      if (vimModeRef.current) {
+        if ('dispose' in vimModeRef.current && typeof vimModeRef.current.dispose === 'function') {
+          vimModeRef.current.dispose();
+        }
+        vimModeRef.current = null;
+
+        // Clean up status bar text if any
+        if (statusBarRef.current) {
+          statusBarRef.current.innerHTML = '';
+        }
+      }
+    }
+  }, [isVimMode]);
 
   const handleEditorDidMount = useCallback(
     (editorInstance: editor.IStandaloneCodeEditor) => {
-      if (statusBarRef.current) {
-        // Clean up previous vim mode if any
+      editorRef.current = editorInstance;
+
+      if (isVimMode && statusBarRef.current) {
         vimModeRef.current?.dispose();
         vimModeRef.current = initVimMode(editorInstance, statusBarRef.current);
       }
     },
-    [],
+    [isVimMode],
   );
 
   return (

@@ -13,6 +13,7 @@ export default function App() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [validateFn, setValidateFn] = useState<ValidateFunction | null>(null);
   const [showHint, setShowHint] = useState(false);
+  const [isVimMode, setIsVimMode] = useState(true);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const handleChallengeLoad = useCallback((ch: Challenge, fn: ValidateFunction) => {
@@ -33,24 +34,35 @@ export default function App() {
         justifyContent: 'space-between',
         borderBottom: '1px solid #333'
       }}>
-        <h1 style={{ fontSize: '18px', margin: 0, fontWeight: 600 }}>React Training</h1>
-        <select
-          value={selectedChallenge}
-          onChange={(e) => setSelectedChallenge(e.target.value)}
-          style={{
-            padding: '6px 12px',
-            borderRadius: '4px',
-            border: '1px solid #444',
-            background: '#2d2d2d',
-            color: '#fff',
-            fontSize: '14px',
-            cursor: 'pointer'
-          }}
-        >
-          {challenges.map(id => (
-            <option key={id} value={id}>{id}</option>
-          ))}
-        </select>
+        <h1 style={{ fontSize: '18px', margin: 0, fontWeight: 600 }}>React Playground</h1>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={isVimMode}
+              onChange={(e) => setIsVimMode(e.target.checked)}
+              style={{ cursor: 'pointer' }}
+            />
+            Vim Mode
+          </label>
+          <select
+            value={selectedChallenge}
+            onChange={(e) => setSelectedChallenge(e.target.value)}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: '1px solid #444',
+              background: '#2d2d2d',
+              color: '#fff',
+              fontSize: '14px',
+              cursor: 'pointer'
+            }}
+          >
+            {challenges.map(id => (
+              <option key={id} value={id}>{id}</option>
+            ))}
+          </select>
+        </div>
       </header>
 
       <ChallengeLoader challengeId={selectedChallenge} onLoad={handleChallengeLoad} />
@@ -141,7 +153,7 @@ export default function App() {
               }}>
                 Editor
               </div>
-              <CodeEditor value={code} onChange={setCode} />
+              <CodeEditor value={code} onChange={setCode} isVimMode={isVimMode} />
             </div>
 
           </div>

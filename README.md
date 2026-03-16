@@ -1,73 +1,39 @@
-# React + TypeScript + Vite
+# React Playground
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A lightweight, purely local React playground environment with vim support.
 
-Currently, two official plugins are available:
+## Motivation 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Testing and validating backend code logic is incredibly easy with simple terminal scripts or REPLs. However, doing the same for React code often requires significant boilerplate or relying on external cloud-based sandbox websites. 
 
-## React Compiler
+This React Playground is designed to bring that same quick, frictionless testing experience to React. It removes the need to think about local setup or environment configuration—just launch it and start writing and validating code instantly. Plus, it is completely self-contained and operates 100% offline.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Setup Instructions
 
-## Expanding the ESLint configuration
+1. **Install Dependencies**
+   Make sure you have Node.js installed, then run:
+   ```bash
+   npm install
+   ```
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+2. **Start the Development Server**
+   Run the following to start the application locally:
+   ```bash
+   npm run dev
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+3. **Open the App**
+   Navigate to the local Vite URL provided in your terminal (usually `http://localhost:5173`).
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Usage
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+* **Select a Challenge:** Use the dropdown in the header to select a React challenge.
+* **Vim Mode:** Toggle the Vim Mode switch in the header to enable or disable Vim bindings in the code editor.
+* **Validate Details:** Write your code in the editor, and hit "Validate" to check whether your component meets the challenge criteria.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Adding Challenges
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+New challenges can be added within the `challenges/` directory. Each challenge folder should contain:
+* `instructions.md` - The problem description and hints.
+* `starter.tsx` - The boilerplate starting code.
+* `validate.ts` - The exact tests checking the component rendering logic.

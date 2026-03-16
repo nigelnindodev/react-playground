@@ -2,6 +2,8 @@
 
 A lightweight, purely local React playground environment with vim support.
 
+<img width="1353" height="674" alt="Screenshot from 2026-03-16 06-38-07" src="https://github.com/user-attachments/assets/38c22bf7-018b-4230-9131-435075d6e94a" />
+
 ## Motivation 
 
 Testing and validating backend code logic is incredibly easy with simple terminal scripts or REPLs. However, doing the same for React code often requires significant boilerplate or relying on external cloud-based sandbox websites. 

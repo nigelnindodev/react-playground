@@ -10,4 +10,4 @@ export interface ValidationResult {
   message: string;
 }
 
-export type ValidateFunction = (container: HTMLElement) => ValidationResult;
+export type ValidateFunction = (container: HTMLElement) => ValidationResult | Promise<ValidationResult>;

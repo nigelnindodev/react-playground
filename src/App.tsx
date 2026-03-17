@@ -5,7 +5,20 @@ import Validator from './components/Validator';
 import ChallengeLoader from './components/ChallengeLoader';
 import type { Challenge, ValidateFunction } from './types';
 
-const challenges = ['01-counter'];
+const challenges = [
+  '01-counter',
+  '02-todo-list',
+  '03-fetch-data',
+  '04-context-theme',
+  '05-memoized-fibonacci',
+  '06-custom-modal',
+  '07-virtualized-list',
+  '09-accordion',
+  '10-form-validation',
+  '11-infinite-scroll',
+  '12-drag-and-drop',
+  '13-debounced-search'
+];
 
 export default function App() {
   const [selectedChallenge, setSelectedChallenge] = useState<string>(challenges[0]);

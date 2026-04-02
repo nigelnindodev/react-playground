@@ -11,8 +11,6 @@ interface CodeEditorProps {
 }
 
 function handleEditorWillMount(monaco: Monaco) {
-  // Suppress TypeScript diagnostics for unresolved modules (e.g. 'react')
-  // since the editor is just a code authoring surface for challenges.
   monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
     noSemanticValidation: true,
     noSyntaxValidation: false,
@@ -34,6 +32,12 @@ export default function CodeEditor({ value, onChange, isVimMode = true }: CodeEd
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
+    return () => {
+      vimModeRef.current?.dispose();
+    };
+  }, []);
+
+  useEffect(() => {
     if (!editorRef.current || !statusBarRef.current) return;
 
     if (isVimMode) {
@@ -42,12 +46,8 @@ export default function CodeEditor({ value, onChange, isVimMode = true }: CodeEd
       }
     } else {
       if (vimModeRef.current) {
-        if ('dispose' in vimModeRef.current && typeof vimModeRef.current.dispose === 'function') {
-          vimModeRef.current.dispose();
-        }
+        vimModeRef.current.dispose();
         vimModeRef.current = null;
-
-        // Clean up status bar text if any
         if (statusBarRef.current) {
           statusBarRef.current.innerHTML = '';
         }

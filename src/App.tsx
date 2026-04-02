@@ -33,7 +33,7 @@ export default function App() {
     setChallenge(ch);
     setCode(ch.starterCode);
     setValidateFn(() => fn);
-    setShowHint(false); // Reset hints when loading a new challenge
+    setShowHint(false);
   }, []);
 
   return (

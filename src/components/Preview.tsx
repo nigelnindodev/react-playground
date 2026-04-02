@@ -6,26 +6,17 @@ interface PreviewProps {
   containerRef: MutableRefObject<HTMLDivElement | null>;
 }
 
-/**
- * Strip import/export statements from raw source code so
- * Babel standalone can process it as a plain script (not a module).
- * React hooks are provided as globals from the UMD build.
- */
 function prepareCodeForPreview(raw: string): string {
   return raw
     .split('\n')
     .map((line) => {
       const trimmed = line.trim();
-      // Remove import lines
       if (trimmed.startsWith('import ')) return '';
-      // "export default function Foo" → "function Foo"
       if (trimmed.startsWith('export default function '))
         return line.replace('export default function ', 'function ');
       if (trimmed.startsWith('export default class '))
         return line.replace('export default class ', 'class ');
-      // "export default Foo;" → ""
       if (trimmed.startsWith('export default ')) return '';
-      // "export function Foo" → "function Foo"
       if (trimmed.startsWith('export ')) return line.replace('export ', '');
       return line;
     })
@@ -65,7 +56,6 @@ export default function Preview({ code, containerRef }: PreviewProps) {
         <body>
           <div id="root"></div>
           <script>
-            // Destructure commonly-used React APIs as globals
             var useState = React.useState;
             var useEffect = React.useEffect;
             var useRef = React.useRef;
@@ -76,7 +66,7 @@ export default function Preview({ code, containerRef }: PreviewProps) {
             var createContext = React.createContext;
             var Fragment = React.Fragment;
           </script>
-          <script type="text/babel" data-presets="react">
+          <script type="text/babel" data-presets="react,typescript">
             (function() {
               try {
                 ${processedCode}
@@ -103,7 +93,6 @@ export default function Preview({ code, containerRef }: PreviewProps) {
         setError(event.data.error);
       } else if (event.data.type === 'preview-success') {
         setError(null);
-        // Set containerRef only after the component has rendered
         const iframeDoc = iframe.contentDocument;
         if (iframeDoc) {
           containerRef.current = iframeDoc.getElementById('root') as HTMLDivElement | null;
